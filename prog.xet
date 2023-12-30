@@ -1,0 +1,41 @@
+env math{first}
+
+1.2233
+-22.0
+
+env sibling1 { 
+	env inner {
+		literal inside sibling1
+	}
+
+	literal as a sibling to inner 
+
+	env siblingToInner {
+	hi
+		env innerinner {
+			hi there
+		}
+		hi again
+
+	}
+} 
+
+my literal 
+
+env sibling2 {
+	litral inside sibling 2
+}
+
+// this is my article!
+// // COMMENT ALERT!!!!
+// // environment env envy 1env
+// env mathouter {}
+// 	f(x) = x + 1
+// hi thereeee comment
+// env center {
+// 	env math {
+// 		f(x) = x + 1
+// 	}
+// }
+
+hi there

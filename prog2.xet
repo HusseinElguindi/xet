@@ -1,0 +1,8 @@
+this is my article!
+
+this is some math $dy/dx = f(x)$. this is escaped: \$.
+
+env math {
+	tex { \int_a^b {f(x) dx} }
+	int_a^b f(x) dx
+}
