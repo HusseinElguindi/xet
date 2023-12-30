@@ -1,6 +1,7 @@
-use crate::token::{LiteralType, Token, TokenType};
-
-use super::{Node, Parser};
+use crate::{
+    parser::{Node, Parser},
+    token::TokenType,
+};
 
 #[derive(Debug)]
 pub struct LiteralNode(String);

@@ -3,14 +3,13 @@ mod reader;
 mod scanner;
 mod token;
 
-use anyhow::Result;
 use parser::Parser;
 use reader::Reader;
 use scanner::Scanner;
-use std::fs::File;
-use token::Token;
+use token::{Token, TokenType};
 
-use crate::token::{LiteralType, TokenType};
+use anyhow::Result;
+use std::fs::File;
 
 fn main() -> Result<()> {
     // Scanner

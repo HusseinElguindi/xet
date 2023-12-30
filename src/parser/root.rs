@@ -1,6 +1,4 @@
-use crate::token::{Token, TokenType};
-
-use super::{Node, Parser};
+use crate::parser::Node;
 
 #[derive(Debug)]
 pub struct RootNode {

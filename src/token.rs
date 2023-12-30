@@ -5,9 +5,6 @@ pub enum TokenType {
     RBRACE,
     LPAREN,
     RPAREN,
-    // LBRACK, RBRACK,
-    ID,
-    NUM,
 
     Eq,
     EqEq,
@@ -59,6 +56,7 @@ pub enum KeywordType {
     ENV,
 }
 
+/// Accepts a lexeme and returns the type of keyword that was matched or None if not matched.
 pub fn match_keyword(lexeme: &str) -> Option<KeywordType> {
     match lexeme {
         "env" => Some(KeywordType::ENV),
@@ -70,12 +68,5 @@ pub fn match_keyword(lexeme: &str) -> Option<KeywordType> {
 pub struct Token {
     pub tpe: TokenType,
     pub lexeme: String,
-
     pub line: usize,
-}
-
-impl Token {
-    pub fn new(tpe: TokenType, lexeme: String, line: usize) -> Self {
-        Self { tpe, lexeme, line }
-    }
 }

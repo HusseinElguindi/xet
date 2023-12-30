@@ -1,17 +1,15 @@
 mod env;
-mod error;
 mod literal;
 mod root;
 mod verbatim;
 
 use crate::{
     parser::root::RootNode,
-    token::{KeywordType, LiteralType, Token, TokenType},
+    token::{KeywordType, Token, TokenType},
 };
 
 use anyhow::{ensure, Context, Result};
 
-use core::panic;
 use std::{iter::Peekable, vec::IntoIter};
 
 use env::EnvNode;

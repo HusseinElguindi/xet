@@ -1,5 +1,7 @@
-use super::{Node, Parser};
-use crate::token::{LiteralType, Token, TokenType};
+use crate::{
+    parser::{Node, Parser},
+    token::{LiteralType, Token, TokenType},
+};
 
 use anyhow::{anyhow, ensure, Context, Result};
 

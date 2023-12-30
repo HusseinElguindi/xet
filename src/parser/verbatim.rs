@@ -1,4 +1,7 @@
-use super::{Node, Parser, Token};
+use crate::{
+    parser::{Node, Parser},
+    token::Token,
+};
 
 #[derive(Debug)]
 pub struct VerbatimNode(String);
