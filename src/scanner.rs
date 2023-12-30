@@ -91,9 +91,6 @@ impl<'a> Scanner<'a> {
                 '/' if matches!(self.chars.peek(), Some(x) if *x == '/') => {
                     // Comments end at the first newline
                     self.advance_while_peek(|peek| peek != '\n');
-                    // Consume and discard the newline character
-                    self.chars.next();
-                    self.line += 1;
                     TokenType::COMMENT
                 }
                 '/' => TokenType::SLASH,
