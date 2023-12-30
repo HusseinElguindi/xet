@@ -1,8 +1,7 @@
-use core::panic;
-
+use super::{Node, Parser};
 use crate::token::{LiteralType, Token, TokenType};
 
-use super::{Node, Parser};
+use anyhow::{anyhow, ensure, Context, Result};
 
 #[derive(Debug)]
 pub struct EnvNode {
@@ -11,32 +10,40 @@ pub struct EnvNode {
 }
 
 impl EnvNode {
-    pub fn parse(parser: &mut Parser) -> Self {
+    pub fn parse(parser: &mut Parser) -> Result<Self> {
         // Consume/discard the ENV token
         parser.tokens.next();
         // Discard whitespace
         parser.skip_whitespace();
 
-        let name = match parser.tokens.next().expect("expected an env name") {
+        let name = match parser
+            .tokens
+            .next()
+            .context("expected an environment identifier")?
+        {
             Token {
                 tpe: TokenType::LITERAL(LiteralType::STRING),
                 lexeme: name,
                 line: _,
             } => name,
-            _ => panic!("expected a string literal env name"),
+            _ => return Err(anyhow!("environment name must be a string literal")),
         };
         parser.skip_whitespace();
-        assert!(matches!(
-            parser.tokens.next(),
-            Some(Token {
-                tpe: TokenType::LBRACE,
-                lexeme: _,
-                line: _
-            })
-        ));
 
-        let body = parser._parse(Some(TokenType::RBRACE));
-        Self { name, body }
+        ensure!(
+            matches!(
+                parser.tokens.next(),
+                Some(Token {
+                    tpe: TokenType::LBRACE,
+                    lexeme: _,
+                    line: _
+                })
+            ),
+            "expected '{{' after environment name"
+        );
+
+        let body = parser._parse(Some(TokenType::RBRACE))?;
+        Ok(Self { name, body })
     }
 }
 

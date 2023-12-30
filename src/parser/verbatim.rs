@@ -1,30 +1,27 @@
-use super::{Node, Parser};
+use super::{Node, Parser, Token};
 
 #[derive(Debug)]
 pub struct VerbatimNode(String);
 
-// TODO: optional combine function, accepts peek and returns true if can combine the token. Optimization to reduce number of tree nodes
 impl VerbatimNode {
-    pub fn parse(parser: &mut Parser) -> Self {
-        // This token is guaranteed to not be None
-        Self(parser.tokens.next().unwrap().lexeme)
+    /// Parses tokens, whose lexemes will be reflected verbatim in generated code. There must be at
+    /// least one token in the parser's token iterator. The combine predicate should return true if
+    /// the next token's lexeme should me combined into this node's body. It is passed the next
+    /// (peeked) token.
+    pub fn parse(parser: &mut Parser, combine: impl Fn(&Token) -> bool) -> Self {
+        let mut body = parser.tokens.next().unwrap().lexeme;
 
-        // // Foundation for combine function behaviour
-        // let mut body = "".to_string();
-        // while let Some(token) = parser.tokens.peek() {
-        //     // TODO: escaped characters, in conjuction with environments above
-        //     // {} will need to be escaped to be part of a literal
-        //     match token.tpe {
-        //         TokenType::KEYWORD(_)
-        //         | TokenType::COMMENT
-        //         | TokenType::LBRACE
-        //         | TokenType::RBRACE => break, // parse until a keyword or whitespace is reached
-        //         _ => body.push_str(&token.lexeme),
-        //     };
-        //     parser.tokens.next();
-        // }
+        // Combine the next token if the combine predicate is true.
+        while let Some(token) = parser.tokens.peek() {
+            if combine(token) {
+                body.push_str(&token.lexeme);
+            } else {
+                break;
+            }
+            parser.tokens.next();
+        }
 
-        // Self { body }
+        Self(body)
     }
 }
 

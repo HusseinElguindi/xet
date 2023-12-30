@@ -3,15 +3,16 @@ mod reader;
 mod scanner;
 mod token;
 
+use anyhow::Result;
 use parser::Parser;
 use reader::Reader;
 use scanner::Scanner;
-use std::{error::Error, fs::File};
+use std::fs::File;
 use token::Token;
 
 use crate::token::{LiteralType, TokenType};
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<()> {
     // Scanner
     let mut file = File::open("./prog.xet")?;
     let reader = Reader(&mut file);
@@ -29,7 +30,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Parser
     let mut parser = Parser::new(tokens);
     let root = parser.parse();
-    println!("{}", root.codegen());
+    println!("{}", root?.codegen());
 
     Ok(())
 }
