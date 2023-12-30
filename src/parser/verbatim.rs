@@ -1,16 +1,13 @@
 use super::{Node, Parser};
 
 #[derive(Debug)]
-pub struct VerbatimNode {
-    body: String,
-}
+pub struct VerbatimNode(String);
 
 // TODO: optional combine function, accepts peek and returns true if can combine the token. Optimization to reduce number of tree nodes
 impl VerbatimNode {
     pub fn parse(parser: &mut Parser) -> Self {
-        Self {
-            body: parser.tokens.next().unwrap().lexeme,
-        }
+        // This token is guaranteed to not be None
+        Self(parser.tokens.next().unwrap().lexeme)
 
         // // Foundation for combine function behaviour
         // let mut body = "".to_string();
@@ -33,6 +30,6 @@ impl VerbatimNode {
 
 impl Node for VerbatimNode {
     fn codegen(&self) -> String {
-        self.body.clone()
+        self.0.clone()
     }
 }

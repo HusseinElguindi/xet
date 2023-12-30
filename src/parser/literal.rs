@@ -1,13 +1,9 @@
-use core::panic;
-
 use crate::token::{LiteralType, Token, TokenType};
 
 use super::{Node, Parser};
 
 #[derive(Debug)]
-pub struct LiteralNode {
-    body: String,
-}
+pub struct LiteralNode(String);
 
 // Parsing of literals in text mode
 
@@ -30,12 +26,12 @@ impl LiteralNode {
             parser.tokens.next();
         }
 
-        Self { body }
+        Self(body)
     }
 }
 
 impl Node for LiteralNode {
     fn codegen(&self) -> String {
-        self.body.clone()
+        self.0.clone()
     }
 }
