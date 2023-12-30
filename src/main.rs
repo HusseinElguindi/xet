@@ -16,7 +16,7 @@ fn main() -> Result<()> {
     let mut file = File::open("./prog.xet")?;
     let reader = Reader(&mut file);
     let scanner = Scanner::new(reader);
-    let tokens = scanner.scan();
+    let tokens = scanner.scan()?;
     println!(
         "{:?}",
         tokens

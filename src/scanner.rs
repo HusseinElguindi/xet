@@ -3,6 +3,8 @@ use std::iter::Peekable;
 use crate::reader::{self, Reader};
 use crate::token::{self, LiteralType, Token, TokenType, WhiteSpaceType};
 
+use anyhow::{ensure, Context, Result};
+
 pub struct Scanner<'a> {
     current: String,                   // The current lexeme
     line: usize,                       // The current line
@@ -20,7 +22,7 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub fn scan(mut self) -> Vec<Token> {
+    pub fn scan(mut self) -> Result<Vec<Token>> {
         while let Some(c) = self.chars.next() {
             self.current.push(c);
 
@@ -50,7 +52,7 @@ impl<'a> Scanner<'a> {
                         self.current.push('.');
                         self.chars.next();
 
-                        self.match_char(|peek| peek.is_alphanumeric()); // expect at least one more digit after a decimal point
+                        self.match_char(|peek| peek.is_alphanumeric())?; // expect at least one more digit after a decimal point
                         self.advance_while_peek(|peek| peek.is_alphanumeric());
                     }
 
@@ -107,21 +109,20 @@ impl<'a> Scanner<'a> {
                 self.line += 1;
             }
         }
-        assert!(self.current.is_empty()); // there should not be an incomplete token
-                                          // self.current.clear();
         self.make_token(TokenType::EOF);
-
-        self.tokens
+        Ok(self.tokens)
     }
 
-    // Match an expected character and advance
-    fn match_char(&mut self, pred: impl Fn(char) -> bool) {
-        let c = self.chars.next().unwrap();
-        assert!(pred(c), "did not match expected character"); // TODO: return Result for granular error handling
+    /// Match an expected character and advances.
+    fn match_char(&mut self, pred: impl Fn(char) -> bool) -> Result<()> {
+        let c = self.chars.next().context("unexpected character")?;
+        ensure!(pred(c), "unexpected character");
         self.current.push(c);
+        Ok(())
     }
 
-    // Advances the extent of the token as long the predicate is true. The predicated is passed the peeked character. The last character (fails pred) is not consumed.
+    /// Advances the extent of the token as long the predicate is true. The predicated is passed
+    /// the peeked character. The last character (fails pred) is not consumed.
     fn advance_while_peek(&mut self, pred: impl Fn(char) -> bool) {
         loop {
             if !self.chars.peek().is_some_and(|&peek| pred(peek)) {
