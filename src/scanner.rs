@@ -1,9 +1,8 @@
-use std::iter::Peekable;
-
 use crate::reader::{self, Reader};
 use crate::token::{self, LiteralType, Token, TokenType, WhiteSpaceType};
 
 use anyhow::{ensure, Context, Result};
+use std::iter::Peekable;
 
 pub struct Scanner<'a> {
     current: String,                   // The current lexeme

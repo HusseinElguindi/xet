@@ -3,27 +3,22 @@ mod literal;
 mod root;
 mod verbatim;
 
-use crate::{
-    parser::root::RootNode,
-    token::{KeywordType, Token, TokenType},
-};
-
-use anyhow::{ensure, Context, Result};
-
-use std::{iter::Peekable, vec::IntoIter};
+use crate::token::{KeywordType, Token, TokenType};
 
 use env::EnvNode;
 use literal::LiteralNode;
-use std::fmt::Debug;
+use root::RootNode;
+use verbatim::VerbatimNode;
 
-use self::verbatim::VerbatimNode;
+use anyhow::{ensure, Context, Result};
+use std::{fmt::Debug, iter::Peekable, vec};
 
 pub trait Node: Debug {
     fn codegen(&self) -> String;
 }
 
 pub struct Parser {
-    tokens: Peekable<IntoIter<Token>>,
+    tokens: Peekable<vec::IntoIter<Token>>,
 }
 
 impl Parser {
