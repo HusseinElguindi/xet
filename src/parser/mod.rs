@@ -36,7 +36,7 @@ impl Parser {
     // TODO: tex { } can be a "portal" to tex, everything inside is passed verbatim to tex
 
     pub fn parse(&mut self) -> Result<Box<dyn Node>> {
-        let body = self._parse(None).with_context(|| {
+        let body = self.parse_until(None).with_context(|| {
             format!(
                 "Parse error{}",
                 self.tokens
@@ -58,7 +58,7 @@ impl Parser {
     /// Parses and advances the token iterator until the specified token type is encountered, the
     /// terminating token is also consumned. If a terminating token is not specified, parsing
     /// continues until the iterator is empty.
-    fn _parse(&mut self, until_tpe: Option<TokenType>) -> Result<Vec<Box<dyn Node>>> {
+    fn parse_until(&mut self, until_tpe: Option<TokenType>) -> Result<Vec<Box<dyn Node>>> {
         let mut nodes = vec![]; // this is basically the AST
 
         while let Some(token) = self.tokens.peek() {

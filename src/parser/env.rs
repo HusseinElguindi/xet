@@ -44,7 +44,7 @@ impl EnvNode {
             "expected '{{' after environment name"
         );
 
-        let body = parser._parse(Some(TokenType::RBRACE))?;
+        let body = parser.parse_until(Some(TokenType::RBRACE))?;
         Ok(Self { name, body })
     }
 }
