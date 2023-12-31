@@ -50,8 +50,8 @@ impl Parser {
         // todo!("return a single document token")
     }
 
-    /// Parses and advances the token iterator until the specified token type is encountered, the
-    /// terminating token is also consumned. If a terminating token is not specified, parsing
+    /// Parses and advances the token iterator until the specified token type is peeked, the
+    /// terminating token is not consumned. If a terminating token is not specified, parsing
     /// continues until the iterator is empty.
     fn parse_until(&mut self, until_tpe: Option<TokenType>) -> Result<Vec<Box<dyn Node>>> {
         let mut nodes = vec![]; // this is basically the AST
@@ -60,7 +60,7 @@ impl Parser {
             // Break if we match a token with the passed `until_tpe` type
             if let Some(ref until_tpe) = until_tpe {
                 if *until_tpe == token.tpe {
-                    self.tokens.next();
+                    // self.tokens.next();
                     return Ok(nodes);
                 }
             }
@@ -70,8 +70,8 @@ impl Parser {
                 TokenType::KEYWORD(KeywordType::ENV) => Box::new(EnvNode::parse(self)?),
                 TokenType::LITERAL(_) => Box::new(LiteralNode::parse(self)),
                 TokenType::WHITESPACE(_) | TokenType::VERBATIM => {
-                    Box::new(VerbatimNode::parse(self, |token| {
-                        matches!(token.tpe, TokenType::WHITESPACE(_) | TokenType::VERBATIM)
+                    Box::new(VerbatimNode::parse(self, |peek| {
+                        matches!(peek.tpe, TokenType::WHITESPACE(_) | TokenType::VERBATIM)
                     }))
                 }
                 // TODO: More things
@@ -86,12 +86,24 @@ impl Parser {
         // If the terminating token was matched (early return), then we do not reach here
         ensure!(
             until_tpe.is_none(),
-            "terminating token of type {:?} was not reached",
+            "unexpected token: expected {:?}",
             until_tpe.unwrap()
         );
         Ok(nodes)
     }
 
+    /// Consumes the next token, which is expected to be of type `tpe`.
+    fn consume(&mut self, expected_tpe: TokenType) -> Result<Token> {
+        let token = self.tokens.next();
+        ensure!(
+            token.as_ref().is_some_and(|t| t.tpe == expected_tpe),
+            "unexpected token: expected {:?}",
+            expected_tpe
+        );
+        Ok(token.unwrap())
+    }
+
+    /// Advances the token iterator, discarding whitespace until a non-whitespace token is peeked.
     fn skip_whitespace(&mut self) {
         while let Some(token) = self.tokens.peek() {
             match token.tpe {

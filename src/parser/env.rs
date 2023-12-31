@@ -1,9 +1,9 @@
 use crate::{
     parser::{Node, Parser},
-    token::{LiteralType, Token, TokenType},
+    token::{LiteralType, TokenType},
 };
 
-use anyhow::{anyhow, ensure, Context, Result};
+use anyhow::{Context, Result};
 
 #[derive(Debug)]
 pub struct EnvNode {
@@ -12,39 +12,34 @@ pub struct EnvNode {
 }
 
 impl EnvNode {
+    /// Parses an environment declaration. ENV LITERAL(STRING) LBRACE BODY RBRACE.
     pub fn parse(parser: &mut Parser) -> Result<Self> {
-        // Consume/discard the ENV token
+        // Discard the ENV token
         parser.tokens.next();
-        // Discard whitespace
+
         parser.skip_whitespace();
 
-        let name = match parser
-            .tokens
-            .next()
-            .context("expected an environment identifier")?
-        {
-            Token {
-                tpe: TokenType::LITERAL(LiteralType::STRING),
-                lexeme: name,
-                line: _,
-            } => name,
-            _ => return Err(anyhow!("environment name must be a string literal")),
-        };
+        // Consume the environment name
+        let name = parser
+            .consume(TokenType::LITERAL(LiteralType::STRING))
+            .context("expected a string literal environment name")?
+            .lexeme;
+
         parser.skip_whitespace();
 
-        ensure!(
-            matches!(
-                parser.tokens.next(),
-                Some(Token {
-                    tpe: TokenType::LBRACE,
-                    lexeme: _,
-                    line: _
-                })
-            ),
-            "expected '{{' after environment name"
-        );
+        // LBRACE
+        parser
+            .consume(TokenType::LBRACE)
+            .context("expected '{{' after environment name")?;
 
+        // BODY
         let body = parser.parse_until(Some(TokenType::RBRACE))?;
+
+        // RBRACE
+        parser
+            .consume(TokenType::RBRACE)
+            .context("expected '}}' after environment body declaration")?;
+
         Ok(Self { name, body })
     }
 }
